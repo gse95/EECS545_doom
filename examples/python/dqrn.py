@@ -16,7 +16,7 @@ learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
 epochs = 20
-learning_steps_per_epoch = 45
+learning_steps_per_epoch = 80
 replay_memory_size = 10000
 
 # NN learning settings
@@ -121,6 +121,8 @@ def create_network(session, available_actions_count):
     q = tf.reshape(q, [batch_size, 8, available_actions_count])
 
     q = tf.reduce_max(q,2)
+
+    print("batch size",batch_size)
 
     best_a = tf.argmax(tf.argmax(q, 1),3)
 
