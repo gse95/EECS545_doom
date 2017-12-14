@@ -94,14 +94,28 @@ def create_network(session, available_actions_count):
                                             weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
                                             biases_initializer=tf.constant_initializer(0.1))
     conv2_flat = tf.contrib.layers.flatten(conv2)
-    fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
-                                            weights_initializer=tf.contrib.layers.xavier_initializer(),
-                                            biases_initializer=tf.constant_initializer(0.1))
 
-    q = tf.contrib.layers.fully_connected(fc1, num_outputs=available_actions_count, activation_fn=None,
+    # fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
+    #                                         weights_initializer=tf.contrib.layers.xavier_initializer(),
+    #                                         biases_initializer=tf.constant_initializer(0.1))
+
+    #Recurrent part
+
+    h_size = 300
+    cell = tf.nn.rnn_cell.LSTMCell(h_size)
+    state_in_rnn = cell.zero_state(batch_size,tf.float32)
+
+    rnn_output, state_out = tf.nn.dynamic_rnn(cell,conv2_flat,initial_state=state_in_rnn,dtype=tf.float32)
+
+    rnn_output = tf.reshape(rnn_output,[-1,h_size])
+
+
+    q = tf.contrib.layers.fully_connected(rnn_output, num_outputs=available_actions_count, activation_fn=None,
                                           weights_initializer=tf.contrib.layers.xavier_initializer(),
                                           biases_initializer=tf.constant_initializer(0.1))
-    q = tf.reshape(q,[32,8,available_actions_count])
+
+    # q = tf.reshape(q,[32,8,available_actions_count])
+
 
     best_a = tf.argmax(q, 1)
 
