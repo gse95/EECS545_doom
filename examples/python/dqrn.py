@@ -123,7 +123,7 @@ def create_network(session, available_actions_count):
     q = tf.reshape(q, [batch_size, 8, available_actions_count])
 
     q = tf.reduce_max(q,2)
-    print("q",q.shape,tf)
+    print("q",tf.reduce_max(q,1).shape)
     best_a = tf.argmax(q,1)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
