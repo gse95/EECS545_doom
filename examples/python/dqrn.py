@@ -123,7 +123,7 @@ def create_network(session, available_actions_count):
 
     q = tf.reduce_max(q,2)
 
-    best_a = tf.argmax(tf.argmax(q, 1),3)
+    best_a = tf.argmax(tf.reduce_max(q, 1),1)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
 
