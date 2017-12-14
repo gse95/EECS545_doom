@@ -16,7 +16,7 @@ learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
 epochs = 20
-learning_steps_per_epoch = 50
+learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
 # NN learning settings
@@ -102,7 +102,6 @@ def create_network(session, available_actions_count):
                                           weights_initializer=tf.contrib.layers.xavier_initializer(),
                                           biases_initializer=tf.constant_initializer(0.1))
     best_a = tf.argmax(q, 1)
-    print("qshape",q.shape)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
 
@@ -251,7 +250,7 @@ if __name__ == '__main__':
                 while not game.is_episode_finished():
                     state = preprocess(game.get_state().screen_buffer)
                     best_action_index = get_best_action(state)
-                    print("best_action_index",best_action_index)
+                    # print("best_action_index",best_action_index)
                     game.make_action(actions[best_action_index], frame_repeat)
                 r = game.get_total_reward()
                 test_scores.append(r)
