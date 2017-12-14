@@ -20,7 +20,7 @@ learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
 # NN learning settings
-batch_size = 1
+batch_size = 32
 
 # Training regime
 test_episodes_per_epoch = 100
