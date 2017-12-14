@@ -16,7 +16,7 @@ learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
 epochs = 20
-learning_steps_per_epoch = 47
+learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
 # NN learning settings
@@ -102,7 +102,7 @@ def create_network(session, available_actions_count):
                                           weights_initializer=tf.contrib.layers.xavier_initializer(),
                                           biases_initializer=tf.constant_initializer(0.1))
     best_a = tf.argmax(q, 1)
-    print("best a", best_a.shape)
+
     loss = tf.losses.mean_squared_error(q, target_q_)
 
     optimizer = tf.train.RMSPropOptimizer(learning_rate)
