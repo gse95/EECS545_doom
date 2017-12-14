@@ -121,8 +121,8 @@ def create_network(session, available_actions_count):
     q = tf.reshape(q, [batch_size, 8, available_actions_count])
 
     q = tf.reduce_max(q,2)
-    print("q",q.shape)
-    best_a = tf.argmax(tf.argmax(q, 1),2)
+
+    best_a = tf.argmax(tf.argmax(q, 1),3)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
 
@@ -255,6 +255,7 @@ if __name__ == '__main__':
             print("Training...")
             game.new_episode()
             for learning_step in trange(learning_steps_per_epoch, leave=False):
+                batch_size = 32
                 perform_learning_step(epoch)
                 if game.is_episode_finished():
                     score = game.get_total_reward()
@@ -273,6 +274,7 @@ if __name__ == '__main__':
             test_episode = []
             test_scores = []
             for test_episode in trange(test_episodes_per_epoch, leave=False):
+                batch_size = 1
                 game.new_episode()
                 while not game.is_episode_finished():
                     state = preprocess(game.get_state().screen_buffer)
