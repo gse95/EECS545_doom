@@ -141,7 +141,7 @@ def create_network(session, available_actions_count):
         return session.run(best_a, feed_dict={s1_: state})
 
     def function_simple_get_best_action(state):
-        return function_get_best_action(state.reshape([1, resolution[0], resolution[1], 1]))[0]
+        return function_get_best_action(state.reshape([1, resolution[0], resolution[1], 32]))[0]
 
     return function_learn, function_get_q_values, function_simple_get_best_action
 
