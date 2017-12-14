@@ -20,7 +20,7 @@ learning_steps_per_epoch = 80
 replay_memory_size = 10000
 
 # NN learning settings
-batch_size = 32
+batch_size = 1
 
 # Training regime
 test_episodes_per_epoch = 100
@@ -256,8 +256,7 @@ if __name__ == '__main__':
             print("Training...")
             game.new_episode()
             for learning_step in trange(learning_steps_per_epoch, leave=False):
-                global batch_size
-                batch_size = 32
+
                 perform_learning_step(epoch)
                 if game.is_episode_finished():
                     score = game.get_total_reward()
@@ -276,8 +275,7 @@ if __name__ == '__main__':
             test_episode = []
             test_scores = []
             for test_episode in trange(test_episodes_per_epoch, leave=False):
-                global batch_size
-                batch_size = 1
+
                 game.new_episode()
                 while not game.is_episode_finished():
                     state = preprocess(game.get_state().screen_buffer)
