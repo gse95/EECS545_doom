@@ -157,6 +157,11 @@ def learn_from_memory():
         target_q = get_q_values(s1)
         # target differs from q only for the selected action. The following means:
         # target_Q(s,a) = r + gamma * max Q(s2,_) if isterminal else r
+        print "taget_q", target_q.shape[0]
+        print "q2", q2.shape
+        print "a", a.shape
+        print "r", r.shape
+
         target_q[np.arange(target_q.shape[0]), a] = r + discount_factor * (1 - isterminal) * q2
         learn(s1, target_q)
 
