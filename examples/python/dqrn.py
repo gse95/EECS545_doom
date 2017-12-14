@@ -20,7 +20,7 @@ learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
 # NN learning settings
-batch_size = 32
+batch_size = 1
 
 # Training regime
 test_episodes_per_epoch = 100
@@ -118,12 +118,12 @@ def create_network(session, available_actions_count):
                                           weights_initializer=tf.contrib.layers.xavier_initializer(),
                                           biases_initializer=tf.constant_initializer(0.1))
 
-    best_a = tf.argmax(q, 1)
+
 
     q = tf.reshape(q, [batch_size, 8, available_actions_count])
 
     q = tf.reduce_max(q,2)
-
+    best_a = tf.argmax(q, 1)
     loss = tf.losses.mean_squared_error(q, target_q_)
 
     optimizer = tf.train.RMSPropOptimizer(learning_rate)
