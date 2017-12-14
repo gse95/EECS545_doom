@@ -118,6 +118,7 @@ def create_network(session, available_actions_count):
                                           biases_initializer=tf.constant_initializer(0.1))
 
     best_a = tf.argmax(q, 1)
+    print("best_A",best_a.shape)
 
     q = tf.reshape(q, [batch_size, 8, available_actions_count])
 
