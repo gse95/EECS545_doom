@@ -16,7 +16,7 @@ learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
 epochs = 20
-learning_steps_per_epoch = 2000
+learning_steps_per_epoch = 2
 replay_memory_size = 10000
 
 # NN learning settings
@@ -124,6 +124,10 @@ def create_network(session, available_actions_count):
 
 
     best_a = tf.argmax(tf.argmax(q, 2),1)
+
+    print("best a", best_a.shape)
+    print("con best",tf.argmax(q,2).shape)
+
     q = tf.reduce_max(q,2)
     loss = tf.losses.mean_squared_error(q, target_q_)
 
