@@ -102,7 +102,7 @@ def create_network(session, available_actions_count):
                                           weights_initializer=tf.contrib.layers.xavier_initializer(),
                                           biases_initializer=tf.constant_initializer(0.1))
     best_a = tf.argmax(q, 1)
-    print("best_a",best_a.shape())
+    print("best a", best_a.shape)
     loss = tf.losses.mean_squared_error(q, target_q_)
 
     optimizer = tf.train.RMSPropOptimizer(learning_rate)
