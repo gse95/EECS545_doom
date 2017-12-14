@@ -1,0 +1,1 @@
+if [ ! -e /home/gse/EECS545/ViZDoom/src/vizdoom/../../bin/vizdoom ]; then ln -sf /home/gse/EECS545/ViZDoom/src/vizdoom/src/vizdoom /home/gse/EECS545/ViZDoom/src/vizdoom/../../bin/vizdoom; fi

@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/gse/EECS545/ViZDoom/src/vizdoom/gdtoa/arith.h
+
+/home/gse/EECS545/ViZDoom/src/vizdoom/gdtoa/qnan.c
+stdio.h
+-
+arith.h
+/home/gse/EECS545/ViZDoom/src/vizdoom/gdtoa/arith.h
+
