@@ -16,7 +16,7 @@ learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
 epochs = 20
-learning_steps_per_epoch = 2000
+learning_steps_per_epoch = 50
 replay_memory_size = 10000
 
 # NN learning settings
@@ -250,7 +250,7 @@ if __name__ == '__main__':
                 while not game.is_episode_finished():
                     state = preprocess(game.get_state().screen_buffer)
                     best_action_index = get_best_action(state)
-
+                    print("best_action_index",best_action_index)
                     game.make_action(actions[best_action_index], frame_repeat)
                 r = game.get_total_reward()
                 test_scores.append(r)
