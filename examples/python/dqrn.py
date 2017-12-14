@@ -121,10 +121,10 @@ def create_network(session, available_actions_count):
 
 
 
-    best_a = tf.argmax(q, 1)
+
 
     q = tf.reduce_max(q,2)
-
+    best_a = tf.argmax(q, 1)
     loss = tf.losses.mean_squared_error(q, target_q_)
 
     optimizer = tf.train.RMSPropOptimizer(learning_rate)
