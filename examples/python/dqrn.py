@@ -95,8 +95,7 @@ def create_network(session, available_actions_count):
                                             biases_initializer=tf.constant_initializer(0.1))
     conv2_flat = tf.contrib.layers.flatten(conv2)
 
-    print("batch size", batch_size)
-    
+
     conv2_flat = tf.reshape(conv2_flat,[batch_size,8, 192])
     # fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
     #                                         weights_initializer=tf.contrib.layers.xavier_initializer(),
@@ -123,8 +122,6 @@ def create_network(session, available_actions_count):
     q = tf.reshape(q, [batch_size, 8, available_actions_count])
 
     q = tf.reduce_max(q,2)
-
-
 
     best_a = tf.argmax(tf.argmax(q, 1),3)
 
@@ -259,7 +256,7 @@ if __name__ == '__main__':
             print("Training...")
             game.new_episode()
             for learning_step in trange(learning_steps_per_epoch, leave=False):
-                batch_size = 32
+                global batch_size = 32
                 perform_learning_step(epoch)
                 if game.is_episode_finished():
                     score = game.get_total_reward()
@@ -278,7 +275,7 @@ if __name__ == '__main__':
             test_episode = []
             test_scores = []
             for test_episode in trange(test_episodes_per_epoch, leave=False):
-                batch_size = 1
+                global batch_size = 1
                 game.new_episode()
                 while not game.is_episode_finished():
                     state = preprocess(game.get_state().screen_buffer)
