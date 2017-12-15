@@ -124,7 +124,7 @@ class Worker():
         self.local_AC = AC_Network(s_size,a_size,self.name,trainer)
         self.update_local_ops = update_target_graph('global',self.name)        
         #The Below code is related to setting up the Doom environment
-        game.set_doom_scenario_path("basic.wad") #This corresponds to the simple task we will pose our agent
+        game.set_doom_scenario_path("../../../scenarios/basic.wad") #This corresponds to the simple task we will pose our agent
         game.set_doom_map("map01")
         game.set_screen_resolution(ScreenResolution.RES_160X120)
         game.set_screen_format(ScreenFormat.GRAY8)
