@@ -143,7 +143,9 @@ def learn_from_memory():
         s1, a, s2, isterminal, r = memory.get_sample(batch_size)
 
         q2 = np.max(get_q_values(s2), axis=1)
+        best_a = get_best_action(s2)
 
+        print("best_a",best_a.shape)
         # q2 = get_q_best_action(s2)
 
         target_q = get_q_values(s1)
