@@ -31,6 +31,7 @@ resolution = (30, 45)
 episodes_to_watch = 10
 
 model_savefile = "/tmp/model.ckpt"
+temp_savefile = "/tmp/tempmodel.ckpt"
 save_model = True
 load_model = False
 skip_learning = False
@@ -121,8 +122,15 @@ def create_network(session, available_actions_count):
         return session.run(best_a, feed_dict={s1_: state})
 
     def function_get_q_best_action(state):
-        q_a ,b_a = session.run([q,best_a], feed_dict={s1_: state})
-        q2e = np.max(q_a,1)
+        b_a = session.run(best_a,feed_dict={s1_: state})
+        q_a = t_session.run(q, feed_dict={s1_: state})
+
+        q2e = np.zeros(q_a.shape[0],dtype=np.float32)
+        for i in range(b_a.shape[0]):
+            q2e[i] = q_a[i,b_a[i]]
+
+        saver.restore(session, temp_savefile)
+        saver.save(session, temp_savefile)
         return q2e
 
     def function_simple_get_best_action(state):
@@ -146,7 +154,7 @@ def learn_from_memory():
         target_q = get_q_values(s1)
         # target differs from q only for the selected action. The following means:
         # target_Q(s,a) = r + gamma * max Q(s2,_) if isterminal else r
-       
+
 
         target_q[np.arange(target_q.shape[0]), a] = r + discount_factor * (1 - isterminal) * q2
         learn(s1, target_q)
@@ -219,6 +227,9 @@ if __name__ == '__main__':
 
     session = tf.Session()
     learn, get_q_values, get_best_action, get_q_best_action = create_network(session, len(actions))
+    t_session = tf.Session()
+    learn, get_q_values, get_best_action, get_q_best_action = create_network(t_session, len(actions))
+
     saver = tf.train.Saver()
     if load_model:
         print("Loading model from: ", model_savefile)
@@ -226,6 +237,8 @@ if __name__ == '__main__':
     else:
         init = tf.global_variables_initializer()
         session.run(init)
+        saver.save(session, temp_savefile)
+
     print("Starting the training!")
 
     time_start = time()
