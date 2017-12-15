@@ -228,7 +228,7 @@ if __name__ == '__main__':
     session = tf.Session()
     learn, get_q_values, get_best_action, get_q_best_action = create_network(session, len(actions))
     t_session = tf.Session()
-    learn, get_q_values, get_best_action, get_q_best_action = create_network(t_session, len(actions))
+    create_network(t_session, len(actions))
 
     saver = tf.train.Saver()
     if load_model:
