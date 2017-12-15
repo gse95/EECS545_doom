@@ -38,7 +38,7 @@ save_model = True
 load_model = False
 skip_learning = False
 # Configuration file path
-config_file_path = "../../scenarios/basic.cfg"
+config_file_path = "../../scenarios/deathmatch.cfg"
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
@@ -97,7 +97,7 @@ def create_network(session, available_actions_count):
                                             weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
                                             biases_initializer=tf.constant_initializer(0.1))
     conv2_flat = tf.contrib.layers.flatten(conv2)
-    fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=4608, activation_fn=tf.nn.relu,
+    fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=512, activation_fn=tf.nn.relu,
                                             weights_initializer=tf.contrib.layers.xavier_initializer(),
                                             biases_initializer=tf.constant_initializer(0.1))
 
