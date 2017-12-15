@@ -105,6 +105,8 @@ def create_network(session, available_actions_count):
 
     q_exp = q[:,best_a]
 
+    q_exp = session.run(q_exp)
+
     loss = tf.losses.mean_squared_error(q, target_q_)
 
     optimizer = tf.train.RMSPropOptimizer(learning_rate)
