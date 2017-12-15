@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
 import scipy.signal
-%matplotlib inline # not sure yet how to deal with it.
+#%matplotlib inline # not sure yet how to deal with it.
 from helper import * # Make sure to pip3 install helper
 from vizdoom import *
 
