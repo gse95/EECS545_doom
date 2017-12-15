@@ -103,7 +103,7 @@ def create_network(session, available_actions_count):
                                           biases_initializer=tf.constant_initializer(0.1))
     best_a = tf.argmax(q, 1)
 
-    q_exp = np.max(q)
+    q_exp = q[:,best_a]
 
     loss = tf.losses.mean_squared_error(q, target_q_)
 
