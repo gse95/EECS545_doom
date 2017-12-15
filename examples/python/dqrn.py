@@ -16,7 +16,7 @@ learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
 epochs = 20
-learning_steps_per_epoch = 2000
+learning_steps_per_epoch = 45
 replay_memory_size = 10000
 
 # NN learning settings
@@ -143,7 +143,7 @@ def create_network(session, available_actions_count):
         return session.run(best_a, feed_dict={s1_: state})
 
     def function_simple_get_best_action(state):
-        return function_get_best_action(tf.tile(state.reshape([1, resolution[0], resolution[1], 1]),tf.constant([1,1,1,32],dtype="int32")))[0]
+        return function_get_best_action(tf.tile(state.reshape([1, resolution[0], resolution[1], 1]),[32]))[0]
 
     return function_learn, function_get_q_values, function_simple_get_best_action
 
