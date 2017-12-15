@@ -103,10 +103,6 @@ def create_network(session, available_actions_count):
                                           biases_initializer=tf.constant_initializer(0.1))
     best_a = tf.argmax(q, 1)
 
-    q_exp = q[:,best_a]
-
-    q_exp = session.run(q_exp)
-
     loss = tf.losses.mean_squared_error(q, target_q_)
 
     optimizer = tf.train.RMSPropOptimizer(learning_rate)
@@ -124,8 +120,9 @@ def create_network(session, available_actions_count):
     def function_get_best_action(state):
         return session.run(best_a, feed_dict={s1_: state})
 
-    def function_get_q_best_action(state):
-        return session.run(q_exp, feed_dict={s1_: state})
+    def function_get_q_best_action(state,action):
+        feed_dict = {s1_: state, a_: action}
+        return session.run(q, feed_dict=feed_dict)
 
     def function_simple_get_best_action(state):
         return function_get_best_action(state.reshape([1, resolution[0], resolution[1], 1]))[0]
@@ -142,7 +139,8 @@ def learn_from_memory():
         s1, a, s2, isterminal, r = memory.get_sample(batch_size)
 
         # q2 = np.max(get_q_values(s2), axis=1)
-        q2 = get_q_best_action(s2)
+        best_a = get_best_action(s2)
+        q2 = get_q_best_action(s2,best_a)
 
         target_q = get_q_values(s1)
         # target differs from q only for the selected action. The following means:
