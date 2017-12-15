@@ -300,7 +300,7 @@ with tf.Session() as sess:
 
 
 
-				# Under the *** part.
+"""				# Under the *** part.
                 # Periodically save gifs of episodes, model parameters, and summary statistics.
                 /*
                 if episode_count % 5 == 0 and episode_count != 0:
@@ -328,3 +328,4 @@ with tf.Session() as sess:
                     self.summary_writer.flush()
                 */
 
+"""
