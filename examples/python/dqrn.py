@@ -134,6 +134,7 @@ def create_network(session, available_actions_count):
     def function_learn(s1, target_q):
         feed_dict = {s1_: s1, target_q_: target_q}
         l, _ = session.run([loss, train_step], feed_dict=feed_dict)
+        print("loss",loss)
         return l
 
     def function_get_q_values(state):
@@ -281,7 +282,7 @@ if __name__ == '__main__':
                 while not game.is_episode_finished():
                     state = preprocess(game.get_state().screen_buffer)
                     best_action_index = get_best_action(state)
-
+                    print ("bs",best_action_index)
                     game.make_action(actions[best_action_index], frame_repeat)
                 r = game.get_total_reward()
                 test_scores.append(r)
