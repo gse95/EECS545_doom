@@ -103,7 +103,7 @@ def create_network(session, available_actions_count):
                                           biases_initializer=tf.constant_initializer(0.1))
     best_a = tf.argmax(q, 1)
 
-    q_exp = np.max(q,axis =1)
+    q_exp = np.max(q,1)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
 
@@ -145,6 +145,10 @@ def learn_from_memory():
         target_q = get_q_values(s1)
         # target differs from q only for the selected action. The following means:
         # target_Q(s,a) = r + gamma * max Q(s2,_) if isterminal else r
+        print("r",r)
+        print("rget", target_q)
+        print("q2", q2)
+
         target_q[np.arange(target_q.shape[0]), a] = r + discount_factor * (1 - isterminal) * q2
         learn(s1, target_q)
 
