@@ -35,8 +35,8 @@ temp1_savefile = "/tmp/temp1model.ckpt"
 temp2_savefile = "/tmp/temp2model.ckpt"
 
 save_model = True
-load_model = False
-skip_learning = False
+load_model = True
+skip_learning = True
 # Configuration file path
 config_file_path = "../../scenarios/simpler_basic.cfg"
 
