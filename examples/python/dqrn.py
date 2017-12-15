@@ -144,7 +144,7 @@ def create_network(session, available_actions_count):
 
     def function_simple_get_best_action(state):
         print ("stste",state.shape)
-        return function_get_best_action(state.reshape([1, resolution[0], resolution[1], 1])[0]
+        return function_get_best_action(state.reshape([1, resolution[0], resolution[1], 1]))[0]
 
     return function_learn, function_get_q_values, function_simple_get_best_action
 
