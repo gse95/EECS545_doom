@@ -101,9 +101,11 @@ def create_network(session, available_actions_count):
     q = tf.contrib.layers.fully_connected(fc1, num_outputs=available_actions_count, activation_fn=None,
                                           weights_initializer=tf.contrib.layers.xavier_initializer(),
                                           biases_initializer=tf.constant_initializer(0.1))
+    print("q",q.shape)
     best_a = tf.argmax(q, 1)
+    print("best_a",best_a.shape)
 
-    q2e = np.max(q, axis=1)
+    # q2e = np.max(q, axis=1)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
 
@@ -140,9 +142,9 @@ def learn_from_memory():
     if memory.size > batch_size:
         s1, a, s2, isterminal, r = memory.get_sample(batch_size)
 
-        # q2 = np.max(get_q_values(s2), axis=1)
+        q2 = np.max(get_q_values(s2), axis=1)
 
-        q2 = get_q_best_action(s2,best_a)
+        # q2 = get_q_best_action(s2)
 
         target_q = get_q_values(s1)
         # target differs from q only for the selected action. The following means:
