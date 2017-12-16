@@ -258,7 +258,7 @@ if __name__ == '__main__':
             for learning_step in trange(learning_steps_per_epoch, leave=False):
                 l = perform_learning_step(epoch)
                 x_axis = learning_step+(learning_steps_per_epoch*epoch)
-                row = x_axis+","+l +"\n"
+                row = str(x_axis)+","+str(l) +"\n"
                 train_qloss_csv.write(row)
                 if game.is_episode_finished():
                     score = game.get_total_reward()
@@ -273,7 +273,7 @@ if __name__ == '__main__':
             print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()), \
                   "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max())
 
-            row = epoch+","+train_episodes_finished+","+train_scores.mean()+","+train_scores.std()+","+train_scores.min()+","+train_scores.max()+"\n"
+            row = str(epoch)+","+str(train_episodes_finished)+","+str(train_scores.mean())+","+str(train_scores.std())+","+str(train_scores.min())+","+str(train_scores.max())+"\n"
             train_csv.write(row)
 
 
@@ -296,7 +296,7 @@ if __name__ == '__main__':
                   "max: %.1f" % test_scores.max())
 
 
-            row = epoch+","+test_episodes_finished+","+test_scores.mean()+","+test_scores.std()+","+test_scores.min()+","+test_scores.max()+"\n"
+            row = str(epoch)+","+str(test_episodes_finished)+","+str(test_scores.mean())+","+str(test_scores.std())+","+str(test_scores.min())+","+str(test_scores.max())+"\n"
             test_csv.write(row)
 
 
