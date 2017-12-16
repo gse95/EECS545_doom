@@ -96,7 +96,7 @@ def create_network(session, available_actions_count):
     conv2_flat = tf.contrib.layers.flatten(conv2)
 
 
-    conv2_flat = tf.reshape(conv2_flat,[batch_size,8, 4608])
+    conv2_flat = tf.reshape(conv2_flat,[batch_size,8, 512])
     # fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
     #                                         weights_initializer=tf.contrib.layers.xavier_initializer(),
     #                                         biases_initializer=tf.constant_initializer(0.1))
