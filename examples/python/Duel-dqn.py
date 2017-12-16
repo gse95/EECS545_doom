@@ -296,14 +296,15 @@ if __name__ == '__main__':
                   "max: %.1f" % test_scores.max())
 
 
-            row = str(epoch)+","+str(test_episodes_finished)+","+str(test_scores.mean())+","+str(test_scores.std())+","+str(test_scores.min())+","+str(test_scores.max())+"\n"
-            test_csv.write(row)
+            row = str(epoch)+","+str(test_scores.mean())+","+str(test_scores.std())+","+str(test_scores.min())+","+str(test_scores.max())
 
 
             print("Saving the network weigths to:", model_savefile)
             saver.save(session, model_savefile)
 
             print("Total elapsed time: %.2f minutes" % ((time() - time_start) / 60.0))
+            row = row + "," + str(((time() - time_start) / 60.0))+"\n"
+            test_csv.write(row)
 
     game.close()
     print("======================================")
