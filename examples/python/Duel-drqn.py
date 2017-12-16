@@ -10,7 +10,7 @@ import numpy as np
 import skimage.color, skimage.transform
 import tensorflow as tf
 from tqdm import trange
-
+import numpy.matlib as matlib
 # Q-learning settings
 learning_rate = 0.00025
 # learning_rate = 0.0001
@@ -27,16 +27,15 @@ test_episodes_per_epoch = 100
 
 # Other parameters
 frame_repeat = 12
-resolution = (60, 108)
+resolution = (60,108)
 episodes_to_watch = 10
 
-model_savefile = "/tmp/Duel-dqnmodel.ckpt"
+model_savefile = "/tmp/Duel-drqnmodel.ckpt"
 save_model = True
 load_model = False
 skip_learning = False
 # Configuration file path
-# config_file_path = "../../scenarios/take_cover.cfg"
-# config_file_path = "../../scenarios/health_gathering.cfg"
+# config_file_path = "../../scenarios/defend_the_center.cfg"
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
@@ -94,47 +93,48 @@ def create_network(session, available_actions_count):
                                             activation_fn=tf.nn.relu,
                                             weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
                                             biases_initializer=tf.constant_initializer(0.1))
+    conv2_flat = tf.contrib.layers.flatten(conv2)
 
-    Layer_AC,Layer_VC = tf.split(conv2,2,3)
-
-    Layer_A = tf.contrib.layers.flatten(Layer_AC)
-    Layer_V = tf.contrib.layers.flatten(Layer_VC)
-
-    xav_i = tf.contrib.layers.xavier_initializer()
-    Weights_A = tf.Variable(xav_i([7168//2,available_actions_count]))
-    Weights_V = tf.Variable(xav_i([7168//2,1]))
-
-    Adv = tf.matmul(Layer_A,Weights_A)
-    Val = tf.matmul(Layer_V,Weights_V)
-
-    # DUEL Q
-    # q = Adv + Val
-
-    # MAX DUEL Q
-    # q = Val + (Adv - tf.reduce_max(Adv, reduction_indices=1,keep_dims=True))
-
-    # MEAN DUEL Q
-    q = Val + (Adv - tf.reduce_mean(Adv, reduction_indices=1, keep_dims=True))
-
-    # conv2_flat = tf.contrib.layers.flatten(conv2)
+    # print(conv2_flat.shape,"DDSAADSADSA")
+    conv2_flat = tf.reshape(conv2_flat,[batch_size,8, 896])
     # fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
     #                                         weights_initializer=tf.contrib.layers.xavier_initializer(),
     #                                         biases_initializer=tf.constant_initializer(0.1))
-    #
-    # q = tf.contrib.layers.fully_connected(fc1, num_outputs=available_actions_count, activation_fn=None,
-    #                                       weights_initializer=tf.contrib.layers.xavier_initializer(),
-    #                                       biases_initializer=tf.constant_initializer(0.1))
+
+    #Recurrent part
+
+
+
+    h_size = 300
+    cell = tf.nn.rnn_cell.LSTMCell(h_size)
+    state_in_rnn = cell.zero_state(batch_size,tf.float32)
+
+    rnn_output, state_out = tf.nn.dynamic_rnn(inputs=conv2_flat,cell=cell,initial_state=state_in_rnn,dtype=tf.float32)
+
+    rnn_output = tf.reshape(rnn_output,[-1,h_size])
+
+
+    q = tf.contrib.layers.fully_connected(rnn_output, num_outputs=available_actions_count, activation_fn=None,
+                                          weights_initializer=tf.contrib.layers.xavier_initializer(),
+                                          biases_initializer=tf.constant_initializer(0.1))
+
+    q = tf.reshape(q, [batch_size, 8, available_actions_count])
+
+    q = tf.reduce_max(q,2)
+
     best_a = tf.argmax(q, 1)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
 
     optimizer = tf.train.RMSPropOptimizer(learning_rate)
+
     # Update the parameters according to the computed gradient using RMSProp.
     train_step = optimizer.minimize(loss)
 
     def function_learn(s1, target_q):
         feed_dict = {s1_: s1, target_q_: target_q}
         l, _ = session.run([loss, train_step], feed_dict=feed_dict)
+
         return l
 
     def function_get_q_values(state):
@@ -144,7 +144,9 @@ def create_network(session, available_actions_count):
         return session.run(best_a, feed_dict={s1_: state})
 
     def function_simple_get_best_action(state):
-        return function_get_best_action(state.reshape([1, resolution[0], resolution[1], 1]))[0]
+        # print ("stste",state.shape)
+        state = matlib.repmat(state,32,1)
+        return function_get_best_action(state.reshape([32, resolution[0], resolution[1], 1]))[0]
 
     return function_learn, function_get_q_values, function_simple_get_best_action
 
@@ -161,10 +163,16 @@ def learn_from_memory():
         target_q = get_q_values(s1)
         # target differs from q only for the selected action. The following means:
         # target_Q(s,a) = r + gamma * max Q(s2,_) if isterminal else r
+        # print ("taget_q", target_q.shape[0])
+        # print ("q2", q2.shape)
+        # print ("a", a.shape)
+        # print ("r", r.shape)
+
         target_q[np.arange(target_q.shape[0]), a] = r + discount_factor * (1 - isterminal) * q2
-        l=learn(s1, target_q)
+        l = learn(s1, target_q)
         return l
     return 0
+
 
 def perform_learning_step(epoch):
     """ Makes an action according to eps-greedy policy, observes the result
@@ -232,9 +240,9 @@ if __name__ == '__main__':
     memory = ReplayMemory(capacity=replay_memory_size)
 
     # CSV output
-    train_csv = open("/home/gse/data_final/Duelq/train_scores.csv", "w")
-    test_csv = open("/home/gse/data_final/Duelq/test_scores.csv", "w")
-    train_qloss_csv = open("/home/gse/data_final/Duelq/train_loss.csv", "w")
+    train_csv = open("/home/gse/data_final/DRQN/train_scores.csv", "w")
+    test_csv = open("/home/gse/data_final/DRQN/test_scores.csv", "w")
+    train_qloss_csv = open("/home/gse/data_final/DRQN/train_loss.csv", "w")
 
     session = tf.Session()
     learn, get_q_values, get_best_action = create_network(session, len(actions))
@@ -257,10 +265,11 @@ if __name__ == '__main__':
             print("Training...")
             game.new_episode()
             for learning_step in trange(learning_steps_per_epoch, leave=False):
-                l = perform_learning_step(epoch)
-                x_axis = learning_step+(learning_steps_per_epoch*epoch)
-                row = str(x_axis)+","+str(l) +"\n"
+                l=perform_learning_step(epoch)
+                x_axis = learning_step + (learning_steps_per_epoch * epoch)
+                row = str(x_axis) + "," + str(l) + "\n"
                 train_qloss_csv.write(row)
+
                 if game.is_episode_finished():
                     score = game.get_total_reward()
                     train_scores.append(score)
@@ -274,19 +283,20 @@ if __name__ == '__main__':
             print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()), \
                   "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max())
 
-            row = str(epoch)+","+str(train_episodes_finished)+","+str(train_scores.mean())+","+str(train_scores.std())+","+str(train_scores.min())+","+str(train_scores.max())+"\n"
+            row = str(epoch) + "," + str(train_episodes_finished) + "," + str(train_scores.mean()) + "," + str(
+                train_scores.std()) + "," + str(train_scores.min()) + "," + str(train_scores.max()) + "\n"
             train_csv.write(row)
-
 
             print("\nTesting...")
             test_episode = []
             test_scores = []
             for test_episode in trange(test_episodes_per_epoch, leave=False):
+
                 game.new_episode()
                 while not game.is_episode_finished():
                     state = preprocess(game.get_state().screen_buffer)
                     best_action_index = get_best_action(state)
-                    # print("best_action_index",best_action_index)
+                    # print ("bs",best_action_index)
                     game.make_action(actions[best_action_index], frame_repeat)
                 r = game.get_total_reward()
                 test_scores.append(r)
@@ -295,16 +305,13 @@ if __name__ == '__main__':
             print("Results: mean: %.1f±%.1f," % (
                 test_scores.mean(), test_scores.std()), "min: %.1f" % test_scores.min(),
                   "max: %.1f" % test_scores.max())
-
-
             row = str(epoch)+","+str(test_scores.mean())+","+str(test_scores.std())+","+str(test_scores.min())+","+str(test_scores.max())
-
 
             print("Saving the network weigths to:", model_savefile)
             saver.save(session, model_savefile)
 
             print("Total elapsed time: %.2f minutes" % ((time() - time_start) / 60.0))
-            row = row + "," + str(((time() - time_start) / 60.0))+"\n"
+            row = row + "," + str(((time() - time_start) / 60.0)) + "\n"
             test_csv.write(row)
 
     game.close()
