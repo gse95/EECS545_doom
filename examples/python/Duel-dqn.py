@@ -36,10 +36,11 @@ load_model = False
 skip_learning = False
 # Configuration file path
 # config_file_path = "../../scenarios/take_cover.cfg"
+config_file_path = "../../scenarios/health_gathering.cfg"
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
-config_file_path = "../../scenarios/basic.cfg"
+# config_file_path = "../../scenarios/basic.cfg"
 
 # Converts and down-samples the input image
 def preprocess(img):
