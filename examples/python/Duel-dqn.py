@@ -15,7 +15,7 @@ from tqdm import trange
 learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
-epochs = 20
+epochs = 40
 learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
@@ -36,11 +36,11 @@ load_model = False
 skip_learning = False
 # Configuration file path
 # config_file_path = "../../scenarios/take_cover.cfg"
-# config_file_path = "../../scenarios/health_gathering.cfg"
+config_file_path = "../../scenarios/health_gathering.cfg"
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
-config_file_path = "../../scenarios/basic.cfg"
+# config_file_path = "../../scenarios/basic.cfg"
 
 # Converts and down-samples the input image
 def preprocess(img):
