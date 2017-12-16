@@ -30,7 +30,7 @@ frame_repeat = 12
 resolution = (60,108)
 episodes_to_watch = 10
 
-model_savefile = "/tmp/dqnmodel.ckpt"
+model_savefile = "/home/gse/data_final/DQN/dqnmodel.ckpt"
 save_model = True
 load_model = False
 skip_learning = False
