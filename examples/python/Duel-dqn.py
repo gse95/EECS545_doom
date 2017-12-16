@@ -85,11 +85,11 @@ def create_network(session, available_actions_count):
     target_q_ = tf.placeholder(tf.float32, [None, available_actions_count], name="TargetQ")
 
     # Add 2 convolutional layers with ReLu activation
-    conv1 = tf.contrib.layers.convolution2d(s1_, num_outputs=8, kernel_size=[6, 6], stride=[3, 3],
+    conv1 = tf.contrib.layers.convolution2d(s1_, num_outputs=16, kernel_size=[6, 6], stride=[3, 3],
                                             activation_fn=tf.nn.relu,
                                             weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
                                             biases_initializer=tf.constant_initializer(0.1))
-    conv2 = tf.contrib.layers.convolution2d(conv1, num_outputs=8, kernel_size=[3, 3], stride=[2, 2],
+    conv2 = tf.contrib.layers.convolution2d(conv1, num_outputs=32, kernel_size=[3, 3], stride=[2, 2],
                                             activation_fn=tf.nn.relu,
                                             weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
                                             biases_initializer=tf.constant_initializer(0.1))
@@ -100,8 +100,8 @@ def create_network(session, available_actions_count):
     Layer_V = tf.contrib.layers.flatten(Layer_VC)
 
     xav_i = tf.contrib.layers.xavier_initializer()
-    Weights_A = tf.Variable(xav_i([320//2,available_actions_count]))
-    Weights_V = tf.Variable(xav_i([320//2,1]))
+    Weights_A = tf.Variable(xav_i([1280//2,available_actions_count]))
+    Weights_V = tf.Variable(xav_i([1280//2,1]))
 
     Adv = tf.matmul(Layer_A,Weights_A)
     Val = tf.matmul(Layer_V,Weights_V)
