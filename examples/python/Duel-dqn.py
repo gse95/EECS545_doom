@@ -93,14 +93,36 @@ def create_network(session, available_actions_count):
                                             activation_fn=tf.nn.relu,
                                             weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
                                             biases_initializer=tf.constant_initializer(0.1))
-    conv2_flat = tf.contrib.layers.flatten(conv2)
-    fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
-                                            weights_initializer=tf.contrib.layers.xavier_initializer(),
-                                            biases_initializer=tf.constant_initializer(0.1))
 
-    q = tf.contrib.layers.fully_connected(fc1, num_outputs=available_actions_count, activation_fn=None,
-                                          weights_initializer=tf.contrib.layers.xavier_initializer(),
-                                          biases_initializer=tf.constant_initializer(0.1))
+    Layer_AC,Layer_VC = tf.split(conv2,2,3)
+
+    Layer_A = tf.contrib.layers.flatten(Layer_AC)
+    Layer_V = tf.contrib.layers.flatten(Layer_VC)
+
+    xav_i = tf.contrib.layers.xavier_initializer()
+    Weights_A = tf.Variable(xav_i([320//2,available_actions_count]))
+    Weights_V = tf.Variable(xav_i([320//2,1]))
+
+    Adv = tf.matmul(Layer_A,Weights_A)
+    Val = tf.matmul(Layer_V,Weights_V)
+
+    # DUEL Q
+    # q = Adv + Val
+
+    # MAX DUEL Q
+    # q = Val + (Adv - tf.reduce_max(Adv, reduction_indices=1,keep_dims=True))
+
+    # MEAN DUEL Q
+    q = Val + (Adv - tf.reduce_mean(Adv, reduction_indices=1, keep_dims=True))
+
+    # conv2_flat = tf.contrib.layers.flatten(conv2)
+    # fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
+    #                                         weights_initializer=tf.contrib.layers.xavier_initializer(),
+    #                                         biases_initializer=tf.constant_initializer(0.1))
+    #
+    # q = tf.contrib.layers.fully_connected(fc1, num_outputs=available_actions_count, activation_fn=None,
+    #                                       weights_initializer=tf.contrib.layers.xavier_initializer(),
+    #                                       biases_initializer=tf.constant_initializer(0.1))
     best_a = tf.argmax(q, 1)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
