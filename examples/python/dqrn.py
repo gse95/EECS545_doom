@@ -27,7 +27,7 @@ test_episodes_per_epoch = 100
 
 # Other parameters
 frame_repeat = 12
-resolution = (30, 45)
+resolution = (60,108)
 episodes_to_watch = 10
 
 model_savefile = "/tmp/model.ckpt"
@@ -96,7 +96,7 @@ def create_network(session, available_actions_count):
     conv2_flat = tf.contrib.layers.flatten(conv2)
 
 
-    conv2_flat = tf.reshape(conv2_flat,[batch_size,8, 192])
+    conv2_flat = tf.reshape(conv2_flat,[batch_size,8, 4608])
     # fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
     #                                         weights_initializer=tf.contrib.layers.xavier_initializer(),
     #                                         biases_initializer=tf.constant_initializer(0.1))
@@ -106,10 +106,10 @@ def create_network(session, available_actions_count):
 
 
     h_size = 300
-    cell = tf.nn.rnn_cell.LSTMCell(h_size)
+    cell = tf.contrib.rnn.LSTMCell(h_size)
     state_in_rnn = cell.zero_state(batch_size,tf.float32)
 
-    rnn_output, state_out = tf.nn.dynamic_rnn(cell,conv2_flat,initial_state=state_in_rnn,dtype=tf.float32)
+    rnn_output, state_out = tf.nn.dynamic_rnn(inputs=conv2_flat,cell=cell,initial_state=state_in_rnn,dtype=tf.float32)
 
     rnn_output = tf.reshape(rnn_output,[-1,h_size])
 
@@ -118,11 +118,11 @@ def create_network(session, available_actions_count):
                                           weights_initializer=tf.contrib.layers.xavier_initializer(),
                                           biases_initializer=tf.constant_initializer(0.1))
 
+    # q = tf.reshape(q, [batch_size, 8, available_actions_count])
+
+    # q = tf.reduce_max(q,2)
+
     best_a = tf.argmax(q, 1)
-
-    q = tf.reshape(q, [batch_size, 8, available_actions_count])
-
-    q = tf.reduce_max(q,2)
 
     loss = tf.losses.mean_squared_error(q, target_q_)
 
@@ -219,7 +219,7 @@ def initialize_vizdoom(config_file_path):
     game.load_config(config_file_path)
     game.set_window_visible(False)
     game.set_mode(Mode.PLAYER)
-    game.set_screen_format(ScreenFormat.GRAY8)
+    game.set_screen_format(ScreenFormat.RGB24)
     game.set_screen_resolution(ScreenResolution.RES_640X480)
     game.init()
     print("Doom initialized.")
