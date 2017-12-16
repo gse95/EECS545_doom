@@ -262,7 +262,7 @@ if __name__ == '__main__':
             print("Training...")
             game.new_episode()
             for learning_step in trange(learning_steps_per_epoch, leave=False):
-                perform_learning_step(epoch)
+                l = perform_learning_step(epoch)
                 x_axis = learning_step + (learning_steps_per_epoch * epoch)
                 row = str(x_axis) + "," + str(l) + "\n"
                 train_qloss_csv.write(row)
