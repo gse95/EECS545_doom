@@ -96,7 +96,7 @@ def create_network(session, available_actions_count):
     conv2_flat = tf.contrib.layers.flatten(conv2)
 
 
-    conv2_flat = tf.reshape(conv2_flat,[batch_size,8, 512])
+    conv2_flat = tf.reshape(conv2_flat,[batch_size,8, 40])
     # fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
     #                                         weights_initializer=tf.contrib.layers.xavier_initializer(),
     #                                         biases_initializer=tf.constant_initializer(0.1))
@@ -118,9 +118,9 @@ def create_network(session, available_actions_count):
                                           weights_initializer=tf.contrib.layers.xavier_initializer(),
                                           biases_initializer=tf.constant_initializer(0.1))
 
-    # q = tf.reshape(q, [batch_size, 8, available_actions_count])
+    q = tf.reshape(q, [batch_size, 8, available_actions_count])
 
-    # q = tf.reduce_max(q,2)
+    q = tf.reduce_max(q,2)
 
     best_a = tf.argmax(q, 1)
 
@@ -219,7 +219,7 @@ def initialize_vizdoom(config_file_path):
     game.load_config(config_file_path)
     game.set_window_visible(False)
     game.set_mode(Mode.PLAYER)
-    game.set_screen_format(ScreenFormat.RGB24)
+    game.set_screen_format(ScreenFormat.GRAY8)
     game.set_screen_resolution(ScreenResolution.RES_640X480)
     game.init()
     print("Doom initialized.")
