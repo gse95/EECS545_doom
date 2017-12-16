@@ -27,7 +27,7 @@ test_episodes_per_epoch = 100
 
 # Other parameters
 frame_repeat = 12
-resolution = (30, 45)
+resolution = (60, 108)
 episodes_to_watch = 10
 
 model_savefile = "/tmp/model.ckpt"
@@ -88,16 +88,16 @@ def create_network(session, available_actions_count):
     target_q_ = tf.placeholder(tf.float32, [None, available_actions_count], name="TargetQ")
 
     # Add 2 convolutional layers with ReLu activation
-    conv1 = tf.contrib.layers.convolution2d(s1_, num_outputs=8, kernel_size=[6, 6], stride=[3, 3],
+    conv1 = tf.contrib.layers.convolution2d(s1_, num_outputs=32, kernel_size=[8, 8], stride=[4, 4],
                                             activation_fn=tf.nn.relu,
                                             weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
                                             biases_initializer=tf.constant_initializer(0.1))
-    conv2 = tf.contrib.layers.convolution2d(conv1, num_outputs=8, kernel_size=[3, 3], stride=[2, 2],
+    conv2 = tf.contrib.layers.convolution2d(conv1, num_outputs=64, kernel_size=[4, 4], stride=[2, 2],
                                             activation_fn=tf.nn.relu,
                                             weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
                                             biases_initializer=tf.constant_initializer(0.1))
     conv2_flat = tf.contrib.layers.flatten(conv2)
-    fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=128, activation_fn=tf.nn.relu,
+    fc1 = tf.contrib.layers.fully_connected(conv2_flat, num_outputs=512, activation_fn=tf.nn.relu,
                                             weights_initializer=tf.contrib.layers.xavier_initializer(),
                                             biases_initializer=tf.constant_initializer(0.1))
 
@@ -162,8 +162,8 @@ def learn_from_memory():
 
 
         target_q[np.arange(target_q.shape[0]), a] = r + discount_factor * (1 - isterminal) * q2
-        learn(s1, target_q)
-
+        l = learn(s1, target_q)
+        return l
 
 def perform_learning_step(epoch):
     """ Makes an action according to eps-greedy policy, observes the result
@@ -202,8 +202,8 @@ def perform_learning_step(epoch):
     # Remember the transition that was just experienced.
     memory.add_transition(s1, a, s2, isterminal, reward)
 
-    learn_from_memory()
-
+    l = learn_from_memory()
+    return l
 
 # Creates and initializes ViZDoom environment.
 def initialize_vizdoom(config_file_path):
@@ -229,6 +229,12 @@ if __name__ == '__main__':
 
     # Create replay memory which will store the transitions
     memory = ReplayMemory(capacity=replay_memory_size)
+
+    # CSV output
+    train_csv = open("/home/gse/data_final/DDQN/train_scores.csv", "w")
+    test_csv = open("/home/gse/data_final/DDQN/test_scores.csv", "w")
+    train_qloss_csv = open("/home/gse/data_final/DDQN/train_loss.csv", "w")
+
 
     session = tf.Session()
     learn, get_q_values, get_best_action, get_q_best_action = create_network(session, len(actions))
@@ -257,6 +263,10 @@ if __name__ == '__main__':
             game.new_episode()
             for learning_step in trange(learning_steps_per_epoch, leave=False):
                 perform_learning_step(epoch)
+                x_axis = learning_step + (learning_steps_per_epoch * epoch)
+                row = str(x_axis) + "," + str(l) + "\n"
+                train_qloss_csv.write(row)
+
                 if game.is_episode_finished():
                     score = game.get_total_reward()
                     train_scores.append(score)
@@ -269,6 +279,10 @@ if __name__ == '__main__':
 
             print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()), \
                   "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max())
+
+            row = str(epoch) + "," + str(train_episodes_finished) + "," + str(train_scores.mean()) + "," + str(
+                train_scores.std()) + "," + str(train_scores.min()) + "," + str(train_scores.max()) + "\n"
+            train_csv.write(row)
 
             print("\nTesting...")
             test_episode = []
@@ -288,10 +302,14 @@ if __name__ == '__main__':
                 test_scores.mean(), test_scores.std()), "min: %.1f" % test_scores.min(),
                   "max: %.1f" % test_scores.max())
 
+            row = str(epoch)+","+str(test_scores.mean())+","+str(test_scores.std())+","+str(test_scores.min())+","+str(test_scores.max())
+
             print("Saving the network weigths to:", model_savefile)
             saver.save(session, model_savefile)
 
             print("Total elapsed time: %.2f minutes" % ((time() - time_start) / 60.0))
+            row = row + "," + str(((time() - time_start) / 60.0)) + "\n"
+            test_csv.write(row)
 
     game.close()
     print("======================================")

@@ -15,7 +15,7 @@ from tqdm import trange
 learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
-epochs = 40
+epochs = 20
 learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
@@ -27,7 +27,7 @@ test_episodes_per_epoch = 100
 
 # Other parameters
 frame_repeat = 12
-resolution = (50, 75)
+resolution = (60, 108)
 episodes_to_watch = 10
 
 model_savefile = "/tmp/model.ckpt"
@@ -36,11 +36,11 @@ load_model = False
 skip_learning = False
 # Configuration file path
 # config_file_path = "../../scenarios/take_cover.cfg"
-config_file_path = "../../scenarios/health_gathering.cfg"
+# config_file_path = "../../scenarios/health_gathering.cfg"
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
-# config_file_path = "../../scenarios/basic.cfg"
+config_file_path = "../../scenarios/basic.cfg"
 
 # Converts and down-samples the input image
 def preprocess(img):
@@ -101,8 +101,8 @@ def create_network(session, available_actions_count):
     Layer_V = tf.contrib.layers.flatten(Layer_VC)
 
     xav_i = tf.contrib.layers.xavier_initializer()
-    Weights_A = tf.Variable(xav_i([4480//2,available_actions_count]))
-    Weights_V = tf.Variable(xav_i([4480//2,1]))
+    Weights_A = tf.Variable(xav_i([7168//2,available_actions_count]))
+    Weights_V = tf.Variable(xav_i([7168//2,1]))
 
     Adv = tf.matmul(Layer_A,Weights_A)
     Val = tf.matmul(Layer_V,Weights_V)
@@ -259,6 +259,7 @@ if __name__ == '__main__':
             for learning_step in trange(learning_steps_per_epoch, leave=False):
                 l = perform_learning_step(epoch)
                 x_axis = learning_step+(learning_steps_per_epoch*epoch)
+                print(l,x_axis)
                 row = str(x_axis)+","+str(l) +"\n"
                 train_qloss_csv.write(row)
                 if game.is_episode_finished():
