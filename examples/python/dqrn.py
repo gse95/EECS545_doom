@@ -106,7 +106,7 @@ def create_network(session, available_actions_count):
 
 
     h_size = 300
-    cell = tf.contrib.rnn.LSTMCell(h_size)
+    cell = tf.nn.rnn_cell.LSTMCell(h_size)
     state_in_rnn = cell.zero_state(batch_size,tf.float32)
 
     rnn_output, state_out = tf.nn.dynamic_rnn(inputs=conv2_flat,cell=cell,initial_state=state_in_rnn,dtype=tf.float32)
