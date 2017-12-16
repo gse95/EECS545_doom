@@ -163,7 +163,7 @@ def learn_from_memory():
         target_q[np.arange(target_q.shape[0]), a] = r + discount_factor * (1 - isterminal) * q2
         l=learn(s1, target_q)
         return l
-    return NULL
+    return 0
 
 def perform_learning_step(epoch):
     """ Makes an action according to eps-greedy policy, observes the result
