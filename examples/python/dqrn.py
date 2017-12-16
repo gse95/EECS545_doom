@@ -282,7 +282,7 @@ if __name__ == '__main__':
                 while not game.is_episode_finished():
                     state = preprocess(game.get_state().screen_buffer)
                     best_action_index = get_best_action(state)
-                    print ("bs",best_action_index)
+                    # print ("bs",best_action_index)
                     game.make_action(actions[best_action_index], frame_repeat)
                 r = game.get_total_reward()
                 test_scores.append(r)
