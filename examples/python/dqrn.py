@@ -10,7 +10,7 @@ import numpy as np
 import skimage.color, skimage.transform
 import tensorflow as tf
 from tqdm import trange
-
+import numpy.matlib as matlib
 # Q-learning settings
 learning_rate = 0.00025
 # learning_rate = 0.0001
@@ -32,14 +32,14 @@ episodes_to_watch = 10
 
 model_savefile = "/tmp/model.ckpt"
 save_model = True
-load_model = False
-skip_learning = False
+load_model = True
+skip_learning = True
 # Configuration file path
-config_file_path = "../../scenarios/defend_the_center.cfg"
+# config_file_path = "../../scenarios/defend_the_center.cfg"
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
-# config_file_path = "../../scenarios/basic.cfg"
+config_file_path = "../../scenarios/basic.cfg"
 
 # Converts and down-samples the input image
 def preprocess(img):
@@ -145,7 +145,7 @@ def create_network(session, available_actions_count):
 
     def function_simple_get_best_action(state):
         # print ("stste",state.shape)
-        state = np.matlib.repmat(state,32,1)
+        state = matlib.repmat(state,32,1)
         return function_get_best_action(state.reshape([32, resolution[0], resolution[1], 1]))[0]
 
     return function_learn, function_get_q_values, function_simple_get_best_action

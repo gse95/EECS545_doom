@@ -35,7 +35,7 @@ save_model = True
 load_model = False
 skip_learning = False
 # Configuration file path
-config_file_path = "../../scenarios/simpler_basic.cfg"
+config_file_path = "../../scenarios/basic.cfg"
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
@@ -161,8 +161,9 @@ def learn_from_memory():
         # target differs from q only for the selected action. The following means:
         # target_Q(s,a) = r + gamma * max Q(s2,_) if isterminal else r
         target_q[np.arange(target_q.shape[0]), a] = r + discount_factor * (1 - isterminal) * q2
-        learn(s1, target_q)
-
+        l=learn(s1, target_q)
+        return l
+    return NULL
 
 def perform_learning_step(epoch):
     """ Makes an action according to eps-greedy policy, observes the result
@@ -201,8 +202,8 @@ def perform_learning_step(epoch):
     # Remember the transition that was just experienced.
     memory.add_transition(s1, a, s2, isterminal, reward)
 
-    learn_from_memory()
-
+    l = learn_from_memory()
+    return l
 
 # Creates and initializes ViZDoom environment.
 def initialize_vizdoom(config_file_path):
@@ -229,6 +230,11 @@ if __name__ == '__main__':
     # Create replay memory which will store the transitions
     memory = ReplayMemory(capacity=replay_memory_size)
 
+    # CSV output
+    train_csv = open("/home/gse/data_final/Duelq/train_scores.csv", "w")
+    test_csv = open("/home/gse/data_final/Duelq/test_scores.csv", "w")
+    train_qloss_csv = open("/home/gse/data_final/Duelq/train_loss.csv", "w")
+
     session = tf.Session()
     learn, get_q_values, get_best_action = create_network(session, len(actions))
     saver = tf.train.Saver()
@@ -250,7 +256,10 @@ if __name__ == '__main__':
             print("Training...")
             game.new_episode()
             for learning_step in trange(learning_steps_per_epoch, leave=False):
-                perform_learning_step(epoch)
+                l = perform_learning_step(epoch)
+                x_axis = learning_step+(learning_steps_per_epoch*epoch)
+                row = x_axis+","+l +"\n"
+                train_qloss_csv.write(row)
                 if game.is_episode_finished():
                     score = game.get_total_reward()
                     train_scores.append(score)
@@ -263,6 +272,10 @@ if __name__ == '__main__':
 
             print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()), \
                   "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max())
+
+            row = epoch+","+train_episodes_finished+","+train_scores.mean()+","+train_scores.std()+","+train_scores.min()+","+train_scores.max()+"\n"
+            train_csv.write(row)
+
 
             print("\nTesting...")
             test_episode = []
@@ -281,6 +294,11 @@ if __name__ == '__main__':
             print("Results: mean: %.1f±%.1f," % (
                 test_scores.mean(), test_scores.std()), "min: %.1f" % test_scores.min(),
                   "max: %.1f" % test_scores.max())
+
+
+            row = epoch+","+test_episodes_finished+","+test_scores.mean()+","+test_scores.std()+","+test_scores.min()+","+test_scores.max()+"\n"
+            test_csv.write(row)
+
 
             print("Saving the network weigths to:", model_savefile)
             saver.save(session, model_savefile)
