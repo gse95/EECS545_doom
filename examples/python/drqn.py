@@ -15,7 +15,7 @@ import numpy.matlib as matlib
 learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
-epochs = 20
+epochs = 40
 learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
@@ -187,7 +187,7 @@ def perform_learning_step(epoch):
         start_eps = 1.0
         end_eps = 0.1
         const_eps_epochs = 0.1 * epochs  # 10% of learning time
-        eps_decay_epochs = 0.6 * epochs  # 60% of learning time
+        eps_decay_epochs = 0.8 * epochs  # 60% of learning time
 
         if epoch < const_eps_epochs:
             return start_eps
