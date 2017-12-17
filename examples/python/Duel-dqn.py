@@ -203,7 +203,7 @@ def perform_learning_step(epoch):
         # Choose the best action according to the network.
         a = get_best_action(s1)
 
-    reward = game.make_action(actions[a], frame_repeat) + 0.2*(ammo - prevammo) + 0.1*(health - prevhealth)
+    reward = game.make_action(actions[a], frame_repeat) + 0.3*(ammo - prevammo)
     # print(reward)
     # print(prevammo)
     global prevammo
