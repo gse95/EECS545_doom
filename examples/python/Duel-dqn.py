@@ -15,7 +15,7 @@ from tqdm import trange
 learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
-epochs = 20
+epochs = 40
 learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
@@ -204,8 +204,7 @@ def perform_learning_step(epoch):
         a = get_best_action(s1)
 
     reward = game.make_action(actions[a], frame_repeat) + 0.2*(ammo - prevammo) + 0.1*(health - prevhealth)
-
-    # NEW PART
+    # print(reward)
     # print(prevammo)
     global prevammo
     prevammo = ammo
@@ -272,11 +271,12 @@ if __name__ == '__main__':
 
             print("Training...")
             game.new_episode()
+            global prevammo
+            prevGV = game.get_state().game_variables
+            prevammo = prevGV[0]
+            prevhealth = prevGV[1]
             for learning_step in trange(learning_steps_per_epoch, leave=False):
-                global prevammo
-                prevGV = game.get_state().game_variables
-                prevammo = prevGV[0]
-                prevhealth = prevGV[1]
+
                 l = perform_learning_step(epoch)
                 x_axis = learning_step+(learning_steps_per_epoch*epoch)
                 row = str(x_axis)+","+str(l) +"\n"
@@ -286,6 +286,10 @@ if __name__ == '__main__':
                     train_scores.append(score)
                     game.new_episode()
                     train_episodes_finished += 1
+                    global prevammo
+                    prevGV = game.get_state().game_variables
+                    prevammo = prevGV[0]
+                    prevhealth = prevGV[1]
 
             print("%d training episodes played." % train_episodes_finished)
 

@@ -214,7 +214,7 @@ def perform_learning_step(epoch):
     reward = game.make_action(actions[a], frame_repeat) + 0.2*(ammo - prevammo) + 0.1*(health - prevhealth)
 
     # NEW PART
-    # print(prevammo)
+    print(reward)
     global prevammo
     prevammo = ammo
     global prevhealth
@@ -279,11 +279,12 @@ if __name__ == '__main__':
 
             print("Training...")
             game.new_episode()
+            global prevammo
+            prevGV = game.get_state().game_variables
+            prevammo = prevGV[0]
+            prevhealth = prevGV[1]
             for learning_step in trange(learning_steps_per_epoch, leave=False):
-                global prevammo
-                prevGV = game.get_state().game_variables
-                prevammo = prevGV[0]
-                prevhealth = prevGV[1]
+
                 l=perform_learning_step(epoch)
                 x_axis = learning_step + (learning_steps_per_epoch * epoch)
                 row = str(x_axis) + "," + str(l) + "\n"
@@ -294,7 +295,10 @@ if __name__ == '__main__':
                     train_scores.append(score)
                     game.new_episode()
                     train_episodes_finished += 1
-
+                    global prevammo
+                    prevGV = game.get_state().game_variables
+                    prevammo = prevGV[0]
+                    prevhealth = prevGV[1]
             print("%d training episodes played." % train_episodes_finished)
 
             train_scores = np.array(train_scores)
