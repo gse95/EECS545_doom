@@ -39,7 +39,7 @@ skip_learning = False
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
-config_file_path = "../../scenarios/deadly_corridor.cfg"
+config_file_path = "../../scenarios/predict_position.cfg"
 
 # Converts and down-samples the input image
 def preprocess(img):
