@@ -35,7 +35,7 @@ save_model = True
 load_model = False
 skip_learning = False
 # Configuration file path
-config_file_path = "../../scenarios/predict_position.cfg"
+config_file_path = "../../scenarios/take_cover.cfg"
 
 # config_file_path = "../../scenarios/basic.cfg"
 
