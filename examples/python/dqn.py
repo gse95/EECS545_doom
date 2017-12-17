@@ -35,7 +35,7 @@ save_model = True
 load_model = False
 skip_learning = False
 # Configuration file path
-config_file_path = "../../scenarios/health_gathering.cfg"
+config_file_path = "../../scenarios/deadly_corridor.cfg"
 
 # config_file_path = "../../scenarios/basic.cfg"
 
