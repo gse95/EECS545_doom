@@ -184,7 +184,7 @@ def perform_learning_step(epoch):
     reward = game.make_action(actions[a], frame_repeat) + 0.2*(ammo - prevammo) + 0.1*(health - prevhealth)
 
     # NEW PART
-    print(reward)
+    # print(reward)
     global prevammo
     prevammo = ammo
     global prevhealth
