@@ -15,7 +15,7 @@ import numpy.matlib as matlib
 learning_rate = 0.00025
 # learning_rate = 0.0001
 discount_factor = 0.99
-epochs = 40
+epochs = 20
 learning_steps_per_epoch = 2000
 replay_memory_size = 10000
 
@@ -30,6 +30,10 @@ frame_repeat = 12
 resolution = (60,108)
 episodes_to_watch = 10
 
+prevammo = 100
+prevhealth = 100
+
+
 model_savefile = "/home/gse/data_final/DRQN/drqnmodel.ckpt"
 save_model = True
 load_model = False
@@ -39,7 +43,7 @@ skip_learning = False
 
 
 # config_file_path = "../../scenarios/rocket_basic.cfg"
-config_file_path = "../../scenarios/take_cover.cfg"
+config_file_path = "../../scenarios/defend_the_center.cfg"
 
 # Converts and down-samples the input image
 def preprocess(img):
@@ -196,6 +200,10 @@ def perform_learning_step(epoch):
 
     s1 = preprocess(game.get_state().screen_buffer)
 
+    GV = game.get_state().game_variables
+    ammo = GV[0]
+    health = GV[1]
+
     # With probability eps make a random action.
     eps = exploration_rate(epoch)
     if random() <= eps:
@@ -203,7 +211,14 @@ def perform_learning_step(epoch):
     else:
         # Choose the best action according to the network.
         a = get_best_action(s1)
-    reward = game.make_action(actions[a], frame_repeat)
+    reward = game.make_action(actions[a], frame_repeat) + 0.2*(ammo - prevammo) + 0.1*(health - prevhealth)
+
+    # NEW PART
+    # print(prevammo)
+    global prevammo
+    prevammo = ammo
+    global prevhealth
+    prevhealth = health
 
     isterminal = game.is_episode_finished()
     s2 = preprocess(game.get_state().screen_buffer) if not isterminal else None
@@ -265,6 +280,10 @@ if __name__ == '__main__':
             print("Training...")
             game.new_episode()
             for learning_step in trange(learning_steps_per_epoch, leave=False):
+                global prevammo
+                prevGV = game.get_state().game_variables
+                prevammo = prevGV[0]
+                prevhealth = prevGV[1]
                 l=perform_learning_step(epoch)
                 x_axis = learning_step + (learning_steps_per_epoch * epoch)
                 row = str(x_axis) + "," + str(l) + "\n"
