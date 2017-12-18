@@ -261,9 +261,9 @@ if __name__ == '__main__':
     memory = ReplayMemory(capacity=replay_memory_size)
 
     # CSV output
-    train_csv = open("/home/gse/data_final/DDRQN/train_scores.csv", "w")
-    test_csv = open("/home/gse/data_final/DDRQN/test_scores.csv", "w")
-    train_qloss_csv = open("/home/gse/data_final/DDRQN/train_loss.csv", "w")
+    train_csv = open("/tmp/train_scores.csv", "w")
+    test_csv = open("/tmp/test_scores.csv", "w")
+    train_qloss_csv = open("/tmp/train_loss.csv", "w")
 
     session = tf.Session()
     learn, get_q_values, get_best_action = create_network(session, len(actions))

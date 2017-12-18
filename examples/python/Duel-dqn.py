@@ -33,10 +33,11 @@ episodes_to_watch = 10
 prevammo = 100
 prevhealth = 100
 
-model_savefile = "/home/gse/data_final/Duelq/Duel-dqnmodel.ckpt"
+model_savefile = "/tmp/Duel-dqnmodel.ckpt"
 save_model = True
 load_model = False
 skip_learning = False
+save_csv = False
 # Configuration file path
 # config_file_path = "../../scenarios/take_cover.cfg"
 config_file_path = "../../scenarios/defend_the_center.cfg"
@@ -247,9 +248,10 @@ if __name__ == '__main__':
     memory = ReplayMemory(capacity=replay_memory_size)
 
     # CSV output
-    train_csv = open("/home/gse/data_final/Duelq/train_scores.csv", "w")
-    test_csv = open("/home/gse/data_final/Duelq/test_scores.csv", "w")
-    train_qloss_csv = open("/home/gse/data_final/Duelq/train_loss.csv", "w")
+    if (save_csv):
+        train_csv = open("/home/gse/data_final/Duelq/train_scores.csv", "w")
+        test_csv = open("/home/gse/data_final/Duelq/test_scores.csv", "w")
+        train_qloss_csv = open("/home/gse/data_final/Duelq/train_loss.csv", "w")
 
     session = tf.Session()
     learn, get_q_values, get_best_action = create_network(session, len(actions))
@@ -279,8 +281,9 @@ if __name__ == '__main__':
 
                 l = perform_learning_step(epoch)
                 x_axis = learning_step+(learning_steps_per_epoch*epoch)
-                row = str(x_axis)+","+str(l) +"\n"
-                train_qloss_csv.write(row)
+                if (save_csv):
+                    row = str(x_axis)+","+str(l) +"\n"
+                    train_qloss_csv.write(row)
                 if game.is_episode_finished():
                     score = game.get_total_reward()
                     train_scores.append(score)
@@ -297,9 +300,9 @@ if __name__ == '__main__':
 
             print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()), \
                   "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max())
-
-            row = str(epoch)+","+str(train_episodes_finished)+","+str(train_scores.mean())+","+str(train_scores.std())+","+str(train_scores.min())+","+str(train_scores.max())+"\n"
-            train_csv.write(row)
+            if (save_csv):
+                row = str(epoch)+","+str(train_episodes_finished)+","+str(train_scores.mean())+","+str(train_scores.std())+","+str(train_scores.min())+","+str(train_scores.max())+"\n"
+                train_csv.write(row)
 
 
             print("\nTesting...")
@@ -320,16 +323,17 @@ if __name__ == '__main__':
                 test_scores.mean(), test_scores.std()), "min: %.1f" % test_scores.min(),
                   "max: %.1f" % test_scores.max())
 
-
-            row = str(epoch)+","+str(test_scores.mean())+","+str(test_scores.std())+","+str(test_scores.min())+","+str(test_scores.max())
+            if (save_csv):
+                row = str(epoch)+","+str(test_scores.mean())+","+str(test_scores.std())+","+str(test_scores.min())+","+str(test_scores.max())
 
 
             print("Saving the network weigths to:", model_savefile)
             saver.save(session, model_savefile)
 
             print("Total elapsed time: %.2f minutes" % ((time() - time_start) / 60.0))
-            row = row + "," + str(((time() - time_start) / 60.0))+"\n"
-            test_csv.write(row)
+            if (save_csv):
+                row = row + "," + str(((time() - time_start) / 60.0))+"\n"
+                test_csv.write(row)
 
     game.close()
     print("======================================")

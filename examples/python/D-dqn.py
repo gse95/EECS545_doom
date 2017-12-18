@@ -231,9 +231,9 @@ if __name__ == '__main__':
     memory = ReplayMemory(capacity=replay_memory_size)
 
     # CSV output
-    train_csv = open("/home/gse/data_final/DDQN/train_scores.csv", "w")
-    test_csv = open("/home/gse/data_final/DDQN/test_scores.csv", "w")
-    train_qloss_csv = open("/home/gse/data_final/DDQN/train_loss.csv", "w")
+    train_csv = open("/tmp/train_scores.csv", "w")
+    test_csv = open("/tmp/test_scores.csv", "w")
+    train_qloss_csv = open("/tmp/train_loss.csv", "w")
 
 
     session = tf.Session()
